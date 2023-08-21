@@ -1,34 +1,26 @@
 #include <Ticker.h>
-
 #include <SPI.h>
-
 #include <Wire.h>
 #include <MAX17043.h>
-
-#include <OneWire.h>
-#include <DallasTemperature.h>
-
 #include "cc1101.h"
+#include <DHT.h>
 
+#define DHTPIN 17     
+#define DHTTYPE    DHT11
 #define I2C_SDA 21
 #define I2C_SCL 15
 
-// GPIO where the DS18B20 is connected to
-const int oneWireBus = 2;
 
+
+DHT dht(DHTPIN, DHTTYPE);
 Ticker notificationTimer;
 Ticker delayBeforeSleepTimer;
 Ticker delayBetweenNotificationsTimer;
 uint8_t notificationTimerId = 0;
 uint8_t delayBeforeSleepTimerId = 1;
 uint8_t delayBetweenNotificationsTimerId = 2;
-uint32_t Freq = 0;
 const int maxbauds = 115200;
-int my_bauds;
-int cpufreqs[6] = {240, 160, 80, 40, 20, 10};
-//int i = 0;
 uint16_t prescaler = 80;                    // Between 0 and 65 535
-uint32_t cpu_freq_mhz = 80;                 // Reduce to 80 mhz (default is 240mhz)
 int threshold = 1000000;                    // 64 bits value (limited to int size of 32bits)
 bool isPowerGaugeAvailable = false;
 bool isPowerGaugeActive = false;
@@ -43,16 +35,9 @@ float minVoltage = 2.7;
 float minSafeVoltage = minVoltage * 1.1;
 int charge = 0;
 int waterTemperature;
-int airTemperature;
 bool disableTraceDisplay = false;
 
 MAX17043 powerGauge(40);
-
-// Setup a oneWire instance to communicate with any OneWire devices
-OneWire oneWire(oneWireBus);
-
-// Pass our oneWire reference to Dallas Temperature sensor 
-DallasTemperature sensors(&oneWire);
 
 // N.B. All delays are in seconds
 #define uS_TO_S_FACTOR 1000000ULL         /* Conversion factor for micro seconds to seconds */
@@ -207,36 +192,14 @@ void setupDelayBetweenNotificationsTimer(int seconds) {
   delayBetweenNotificationsTimeOut = false;
 }
 
-void displayDS18B20Info() {
-  char str[50];
-  sprintf(str, "DS18B20 devices count=%d", sensors.getDeviceCount());
-  traceln(str);
-}
-
 void setupSensors() {
-  // Start the DS18B20 sensor
-  sensors.begin();
-
+  dht.begin();
   delay(1000*SETUP_SENSORS_DELAY);
   setupPowerGauge();
 }
 
 void readTemperature() {
-  sensors.requestTemperatures();
-  uint8_t deviceCount = sensors.getDeviceCount();
-
-  switch (deviceCount) {
-    case 0:
-      waterTemperature = airTemperature = 0;
-      break;
-    case 1:
-      waterTemperature = sensors.getTempCByIndex(0);
-      break;
-    case 2:
-      waterTemperature = sensors.getTempCByIndex(0);
-      airTemperature = sensors.getTempCByIndex(1);
-      break;
-  }
+  waterTemperature = dht.readTemperature();
 }
 
 void readSensors() {
@@ -260,8 +223,8 @@ void deepSleep() {
 
 void printSensorsValues() {
     char str[150];
-    sprintf(str, "Notify values: sleep delay=%d seconds, water temperature=%d, air temperature=%d, charge=%d, alarm low voltage=%d", 
-            TIME_TO_SLEEP, waterTemperature, airTemperature, charge, isLowVoltage());
+    sprintf(str, "Notify values: sleep delay=%d seconds, water temperature=%d, charge=%d, alarm low voltage=%d", 
+            TIME_TO_SLEEP, waterTemperature, charge, isLowVoltage());
     traceln(str);
 }
 
@@ -270,8 +233,6 @@ void notifySensorsValues() {
     str += TIME_TO_SLEEP;
     str += ",";
     str += waterTemperature;
-    str += ",";
-    str += airTemperature;
     str += ",";
     str += charge;
     str += ",";
@@ -282,18 +243,17 @@ void notifySensorsValues() {
 
 void setup() {
   char str[150];
-  Serial.begin(my_bauds);   
+  Serial.begin(maxbauds);   
   delay(500);
 
   traceln("Setup started");
-
-  sprintf(str, "Baud rate = %d seconds", my_bauds);
+  
+;
+  sprintf(str, "Baud rate = %d seconds", maxbauds);
   traceln(str);
 
   setupSensors();
   readSensors();
-    
-  displayDS18B20Info();
 
   setupNotification();
   //TODO setupC1101Service(); 

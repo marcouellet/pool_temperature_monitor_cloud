@@ -1,14 +1,11 @@
 #include <Ticker.h>
-
 #include <SPI.h>
-
 #include <Wire.h>
 #include <MAX17043.h>
-
 #include <OneWire.h>
 #include <DallasTemperature.h>
-
-#include "cc1101.h"
+#include <SoftwareSerial.h>
+#include <EByte_LoRa_E32_library.h>
 
 #define I2C_SDA 21
 #define I2C_SCL 15
@@ -24,11 +21,7 @@ uint8_t delayBeforeSleepTimerId = 1;
 uint8_t delayBetweenNotificationsTimerId = 2;
 uint32_t Freq = 0;
 const int maxbauds = 115200;
-int my_bauds;
-int cpufreqs[6] = {240, 160, 80, 40, 20, 10};
-//int i = 0;
 uint16_t prescaler = 80;                    // Between 0 and 65 535
-uint32_t cpu_freq_mhz = 80;                 // Reduce to 80 mhz (default is 240mhz)
 int threshold = 1000000;                    // 64 bits value (limited to int size of 32bits)
 bool isPowerGaugeAvailable = false;
 bool isPowerGaugeActive = false;
@@ -282,12 +275,12 @@ void notifySensorsValues() {
 
 void setup() {
   char str[150];
-  Serial.begin(my_bauds);   
+  Serial.begin(maxbauds);   
   delay(500);
 
   traceln("Setup started");
 
-  sprintf(str, "Baud rate = %d seconds", my_bauds);
+  sprintf(str, "Baud rate = %d seconds", maxbauds);
   traceln(str);
 
   setupSensors();
