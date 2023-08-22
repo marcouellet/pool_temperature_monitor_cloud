@@ -6,5 +6,5 @@
   "fqbn": "esp8266:esp8266:generic:xtal=80,vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=3232,non32xfer=fast,ResetMethod=nodemcu,CrystalFreq=26,FlashFreq=40,FlashMode=dout,eesz=1M64,led=2,sdk=nonosdk_190703,ip=lm2f,dbg=Disabled,lvl=None____,wipe=none,baud=115200",
   "hardwareFolders": "C:\\Users\\Administrator\\AppData\\Local\\Arduino15\\packages",
   "otherLibrariesFolders": "C:\\Users\\Administrator\\OneDrive\\Documents\\Arduino\\libraries",
-  "sketchLocation": "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\sensor_board\\cc1101"
+  "sketchLocation": "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101"
 }

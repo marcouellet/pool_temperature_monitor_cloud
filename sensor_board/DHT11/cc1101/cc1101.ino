@@ -9,10 +9,12 @@
 #define DHTTYPE    DHT11
 #define I2C_SDA 21
 #define I2C_SCL 15
-
-
+#define RADIO_CHANNEL         16
+#define DEVICE_ADDRESS        20 // this device
+#define DEST_ADDRESS          0  // broadcast
 
 DHT dht(DHTPIN, DHTTYPE);
+CC1101 radio;
 Ticker notificationTimer;
 Ticker delayBeforeSleepTimer;
 Ticker delayBetweenNotificationsTimer;
@@ -218,6 +220,7 @@ void deepSleep() {
     sprintf(str, "Going to deep sleep for %d seconds", TIME_TO_SLEEP);
     traceln(str);
 
+    radio.setPowerDownState();
     ESP.deepSleep(TIME_TO_SLEEP * uS_TO_S_FACTOR, RF_DEFAULT);
 }
 
@@ -237,8 +240,24 @@ void notifySensorsValues() {
     str += charge;
     str += ",";
     str += isLowVoltage() ? "1" : "0";
-    //TODO CC1101 send data
+    sendCC1101Data(str.c_str());
     printSensorsValues();
+}
+
+void sendCC1101Data(const char * data) {
+  radio.sendChars(data, DEST_ADDRESS); 
+}
+
+void setupC1101Service() {
+  // Start RADIO
+    while (!radio.begin(CFREQ_922, RADIO_CHANNEL, DEVICE_ADDRESS));   // channel 16! Whitening enabled 
+
+    radio.setOutputPowerLeveldBm(10); // max power
+     
+    delay(1000); // Try again in 5 seconds
+    //radio.printCConfigCheck();     
+
+    traceln("CC1101 radio initialized.");
 }
 
 void setup() {
@@ -248,7 +267,6 @@ void setup() {
 
   traceln("Setup started");
   
-;
   sprintf(str, "Baud rate = %d seconds", maxbauds);
   traceln(str);
 
@@ -256,7 +274,7 @@ void setup() {
   readSensors();
 
   setupNotification();
-  //TODO setupC1101Service(); 
+  setupC1101Service(); 
 }
 
 void loop() {
