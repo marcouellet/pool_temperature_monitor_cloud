@@ -6,40 +6,57 @@
 #include <Ticker.h>
 #include "cc1101.h"
 
+#define BLYNK_TEMPLATE_ID "**********"
+#define BLYNK_TEMPLATE_NAME "*************"
+#include <BlynkSimpleEsp8266.h>
+
 #define RADIO_CHANNEL         16
 #define DEVICE_ADDRESS        21 // this device
 
-#ifndef STASSID
-#define STASSID "your-ssid"
-#define STAPSK "your-password"
-#endif
-
-const char* ssid = STASSID;
-const char* password = STAPSK;
-const char* host = "djxmmx.net";
-const uint16_t port = 17;
 const int maxbauds = 115200;
 int charge = 0;
 int temperature = 0;
 bool disableTraceDisplay = false;
 String  receive_payload;
+
+// Wifi client section
+
+const char* ssid = "**********";
+const char* password = "**********";
+const char* host = "**********";
+const uint16_t port = 17;
+
+// Blynk client section 
+
+#define BLYNK_AUTH_TOKEN "****************************"
+
+char blynkAuth[] = BLYNK_AUTH_TOKEN;
+const char* blynkSsid = "**********";
+const char* blynkPassword = "**********";
+const int blynkVpinTemperature = 10;
+const int blynkVpinCharge = 11;
+
 CC1101 radio;
 
-#line 26 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
+#line 39 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
 void trace(const char * str);
-#line 32 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
+#line 45 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
 void traceln(const char * str);
-#line 38 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
+#line 51 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
 void setupWifiClient();
-#line 56 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
-void setupC1101Service();
 #line 69 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
+void setupBlynkClient();
+#line 76 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
+void setupC1101Service();
+#line 89 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
+void sendDataToBlynkServer();
+#line 94 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
 void sendDataToWifiServer();
-#line 106 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
+#line 131 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
 void setup();
-#line 121 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
+#line 147 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
 void loop();
-#line 26 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
+#line 39 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\wifi_board\\cc1101\\cc1101.ino"
 void trace(const char * str) {
     if (!disableTraceDisplay) {
     Serial.print(str);
@@ -70,6 +87,13 @@ void setupWifiClient() {
     traceln(WiFi.localIP().toString().c_str());
 }
 
+void setupBlynkClient() {
+    Blynk.begin(blynkAuth, blynkSsid, blynkPassword);
+
+    traceln("");
+    traceln("Blynk connected");
+}
+
 void setupC1101Service() {
   // Start RADIO
   while (!radio.begin(CFREQ_922, RADIO_CHANNEL, DEVICE_ADDRESS));   // channel 16! Whitening enabled 
@@ -81,6 +105,11 @@ void setupC1101Service() {
   radio.setRxState();    
 
   traceln("CC1101 radio initialized.");
+}
+
+void sendDataToBlynkServer() {
+    Blynk.virtualWrite(blynkVpinTemperature, temperature); //virtual pin V10
+    Blynk.virtualWrite(blynkVpinCharge, charge); //virtual pin V11
 }
 
 void sendDataToWifiServer() {
@@ -131,7 +160,8 @@ void setup()
     sprintf(str, "Baud rate = %d seconds", maxbauds);
     traceln(str);
 
-    setupWifiClient();
+    //setupWifiClient();
+    setupBlynkClient();
     setupC1101Service();
 }
 
@@ -148,7 +178,8 @@ void loop()
         traceln(receive_payload.c_str());
 		
         //TODO set payload data into charge and temperature variables.
-        sendDataToWifiServer();
+        sendDataToBlynkServer();
+        //sendDataToWifiServer();
         
         delay(100);
     }
