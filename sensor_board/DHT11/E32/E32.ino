@@ -4,14 +4,34 @@
 #include <MAX17043.h>
 #include <DHT.h>
 #include <SoftwareSerial.h>
-#include <EByte_LoRa_E32_library.h>
+#include "LoRa_E32.h"
 
 #define DHTPIN 17     
 #define DHTTYPE    DHT11
 #define I2C_SDA 21
 #define I2C_SCL 15
 
+ /*
+ * LoRa E32-TTL-100
+ * Send fixed broadcast transmission message to a specified channel.
+ * https://www.mischianti.org/2019/11/10/lora-e32-device-for-arduino-esp32-or-esp8266-fixed-transmission-part-4/
+ *
+ * E32-TTL-100----- Arduino UNO or esp8266
+ * M0         ----- 3.3v (To config) GND (To send) 7 (To dinamically manage)
+ * M1         ----- 3.3v (To config) GND (To send) 6 (To dinamically manage)
+ * TX         ----- RX PIN 2 (PullUP)
+ * RX         ----- TX PIN 3 (PullUP & Voltage divider)
+ * AUX        ----- Not connected (5 if you connect)
+ * VCC        ----- 3.3v/5v
+ * GND        ----- GND
+ *
+ */
+
+SoftwareSerial mySerial(D2, D3); // Arduino RX <-- e32 TX, Arduino TX --> e32 RX
+LoRa_E32 e32ttl100(&mySerial, D5, D7, D6);
+
 DHT dht(DHTPIN, DHTTYPE);
+
 Ticker notificationTimer;
 Ticker delayBeforeSleepTimer;
 Ticker delayBetweenNotificationsTimer;
@@ -55,6 +75,12 @@ void trace(const char * str) {
   }
 }
 
+void trace(const char * str, int base) {
+  if (!disableTraceDisplay) {
+    Serial.print(str, base);
+  }
+}
+
 void traceln(const char * str) {
    if (!disableTraceDisplay) {
     Serial.println(str);
@@ -65,6 +91,111 @@ int toFarenheit(int celcius) {
   double c = celcius;
   double f = c * 9.0 / 5.0 + 32.0;
   return (int) f;
+}
+
+void printE32Parameters(struct Configuration configuration) {
+    traceln("----------------------------------------");
+ 
+    trace(F("HEAD BIN: "));  
+    trace(configuration.HEAD, BIN);
+    trace(" ");
+    trace(configuration.HEAD, DEC);
+    trace(" ");
+    traceln(configuration.HEAD, HEX);
+    traceln(F(" "));
+    trace(F("AddH BIN: "));  
+    traceln(configuration.ADDH, BIN);
+    trace(F("AddL BIN: "));  
+    traceln(configuration.ADDL, BIN);
+    trace(F("Chan BIN: "));  
+    trace(configuration.CHAN, DEC); 
+    trace(" -> "); 
+    traceln(configuration.getChannelDescription());
+    traceln(F(" "));
+    trace(F("SpeedParityBit BIN    : "));  
+    trace(configuration.SPED.uartParity, BIN);
+    trace(" -> "); 
+    traceln(configuration.SPED.getUARTParityDescription());
+    trace(F("SpeedUARTDataRate BIN : "));  
+    trace(configuration.SPED.uartBaudRate, BIN);
+    trace(" -> "); 
+    traceln(configuration.SPED.getUARTBaudRate());
+    trace(F("SpeedAirDataRate BIN  : "));  
+    trace(configuration.SPED.airDataRate, BIN);
+    trace(" -> "); 
+    traceln(configuration.SPED.getAirDataRate());
+ 
+    trace(F("OptionTrans BIN       : "));  
+    trace(configuration.OPTION.fixedTransmission, BIN);
+    trace(" -> "); 
+    traceln(configuration.OPTION.getFixedTransmissionDescription());
+    trace(F("OptionPullup BIN      : "));  
+    trace(configuration.OPTION.ioDriveMode, BIN);
+    trace(" -> "); 
+    traceln(configuration.OPTION.getIODroveModeDescription());
+    trace(F("OptionWakeup BIN      : "));  
+    trace(configuration.OPTION.wirelessWakeupTime, BIN);
+    trace(" -> "); 
+    traceln(configuration.OPTION.getWirelessWakeUPTimeDescription());
+    trace(F("OptionFEC BIN         : "));  
+    trace(configuration.OPTION.fec, BIN);
+    trace(" -> "); 
+    traceln(configuration.OPTION.getFECDescription());
+    trace(F("OptionPower BIN       : "));  
+    trace(configuration.OPTION.transmissionPower, BIN);
+    trace(" -> "); 
+    traceln(configuration.OPTION.getTransmissionPowerDescription());
+ 
+    traceln("----------------------------------------");
+ 
+}
+void printE32ModuleInformation(struct ModuleInformation moduleInformation) {
+    traceln("----------------------------------------");
+    trace(F("HEAD BIN: "));  
+    trace(moduleInformation.HEAD, BIN);
+    trace(" ");
+    trace(moduleInformation.HEAD, DEC);
+    trace(" ");
+    traceln(moduleInformation.HEAD, HEX);
+ 
+    trace(F("Freq.: "));  
+    traceln(moduleInformation.frequency, HEX);
+    trace(F("Version  : "));  
+    traceln(moduleInformation.version, HEX);
+    trace(F("Features : "));  
+    traceln(moduleInformation.features, HEX);
+    traceln("----------------------------------------");
+}
+
+void setupE32Service() {
+	e32ttl100.begin();
+
+	// After set configuration comment set M0 and M1 to low
+	// and reboot if you directly set HIGH M0 and M1 to program
+  ResponseStructContainer c = e32ttl100.getConfiguration();
+  // It's important get configuration pointer before all other operation
+  Configuration configuration = *(Configuration*) c.data;
+  configuration.ADDL = 0x01;
+  configuration.ADDH = 0x00;
+  configuration.CHAN = 0x02;
+  configuration.OPTION.fixedTransmission = FT_FIXED_TRANSMISSION;
+  e32ttl100.setConfiguration(configuration, WRITE_CFG_PWR_DWN_SAVE);
+
+  traceln(c.status.getResponseDescription());
+  traceln(c.status.code);
+
+  printE32Parameters(configuration);
+
+  ResponseStructContainer cMi;
+  cMi = e32ttl100.getModuleInformation();
+  // It's important get information pointer before all other operation
+  ModuleInformation mi = *(ModuleInformation*)cMi.data;
+
+  traceln(cMi.status.getResponseDescription());
+  traceln(cMi.status.code);
+
+  printE32ModuleInformation(mi);
+  c.close();
 }
 
 bool isLowVoltage() {
@@ -237,8 +368,14 @@ void notifySensorsValues() {
     str += charge;
     str += ",";
     str += isLowVoltage() ? "1" : "0";
-    //TODO E32 send data
+    sendE32Data(str);
     printSensorsValues();
+}
+
+void sendE32Data(const char * data) {
+	traceln("Send message to E32 Wifi");
+	ResponseStatus rs = e32ttl100.sendFixedMessage(0, 3, 0x04, data);
+	traceln(rs.getResponseDescription());
 }
 
 void setup() {

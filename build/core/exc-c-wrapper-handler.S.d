@@ -1,7 +1,7 @@
 E:\Documents\Flutter\pool_temperature_monitor_cloud\build\core\exc-c-wrapper-handler.S.o: \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266\exc-c-wrapper-handler.S \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266\CommonHFile.h \
- E:\Documents\Flutter\pool_temperature_monitor_cloud\build\core\cc1101.ino.globals.h \
+ E:\Documents\Flutter\pool_temperature_monitor_cloud\build\core\E32.ino.globals.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\3.1.0-gcc10.3-e5f9fec/include/xtensa/coreasm.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\3.1.0-gcc10.3-e5f9fec/include/xtensa/config/core.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\3.1.0-gcc10.3-e5f9fec/include/xtensa/hal.h \

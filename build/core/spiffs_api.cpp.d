@@ -1,7 +1,7 @@
 E:\Documents\Flutter\pool_temperature_monitor_cloud\build\core\spiffs_api.cpp.o: \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266\spiffs_api.cpp \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266\CommonHFile.h \
- E:\Documents\Flutter\pool_temperature_monitor_cloud\build\core\cc1101.ino.globals.h \
+ E:\Documents\Flutter\pool_temperature_monitor_cloud\build\core\E32.ino.globals.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266\spiffs_api.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266\FS.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266/Arduino.h \
@@ -50,8 +50,8 @@ E:\Documents\Flutter\pool_temperature_monitor_cloud\build\core\spiffs_api.cpp.o:
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266/Stream.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266/md5.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266/debug.h \
- C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\variants\generic/pins_arduino.h \
- C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\variants\generic/common.h \
+ C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\variants\nodemcu/pins_arduino.h \
+ c:\users\administrator\appdata\local\arduino15\packages\esp8266\hardware\esp8266\3.1.2\variants\generic\common.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266\FSImpl.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266/FS.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266\spiffs/spiffs.h \

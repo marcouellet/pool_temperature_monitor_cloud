@@ -1,7 +1,7 @@
 E:\Documents\Flutter\pool_temperature_monitor_cloud\build\core\Esp-frag.cpp.o: \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266\Esp-frag.cpp \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266\CommonHFile.h \
- E:\Documents\Flutter\pool_temperature_monitor_cloud\build\core\cc1101.ino.globals.h \
+ E:\Documents\Flutter\pool_temperature_monitor_cloud\build\core\E32.ino.globals.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266\umm_malloc/umm_malloc.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266\umm_malloc/umm_malloc_cfg.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266\umm_malloc/umm_malloc_cfgport.h \
@@ -57,7 +57,7 @@ E:\Documents\Flutter\pool_temperature_monitor_cloud\build\core\Esp-frag.cpp.o: \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266/Stream.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266/md5.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266/debug.h \
- C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\variants\generic/pins_arduino.h \
- C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\variants\generic/common.h \
+ C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\variants\nodemcu/pins_arduino.h \
+ c:\users\administrator\appdata\local\arduino15\packages\esp8266\hardware\esp8266\3.1.2\variants\generic\common.h \
  C:\Users\Administrator\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\3.1.2\cores\esp8266\spi_vendors.h \
  c:\users\administrator\appdata\local\arduino15\packages\esp8266\hardware\esp8266\3.1.2\bootloaders\eboot\spi_vendors.h
