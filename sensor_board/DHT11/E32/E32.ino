@@ -3,8 +3,7 @@
 #include <Wire.h>
 #include <MAX17043.h>
 #include <DHT.h>
-#include <SoftwareSerial.h>
-#include "LoRa_E32.h"
+#include "data_transfer_e32_sensor_impl.h"
 
 #define DHTPIN 17     
 #define DHTTYPE    DHT11
@@ -28,7 +27,7 @@
  */
 
 SoftwareSerial mySerial(D2, D3); // ESP8266 RX <-- e32 TX, ESP8266 TX --> e32 RX
-LoRa_E32 e32ttl100(&mySerial, D5, D7, D6);
+DataTransferE32SensorImpl dataTransferE32(&mySerial, D5, D7, D6);
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -55,7 +54,6 @@ float minVoltage = 2.7;
 float minSafeVoltage = minVoltage * 1.1;
 int charge = 0;
 int waterTemperature;
-bool disableTraceDisplay = false;
 
 MAX17043 powerGauge(40);
 
@@ -70,144 +68,14 @@ MAX17043 powerGauge(40);
 #define SETUP_SENSORS_DELAY  0.5          /* Delay to read DS18B20 data before initialisation */
 #define MESSAGE_TYPE_DATA "DATA"          /* Temperature and charge data */
 
-void trace(const char * str) {
-  if (!disableTraceDisplay) {
-    Serial.print(str);
-  }
-}
-
-void trace(byte b, int base) {
-  if (!disableTraceDisplay) {
-    Serial.print(b, base);
-  }
-}
-
-void traceln(const char * str) {
-   if (!disableTraceDisplay) {
-    Serial.println(str);
-  } 
-}
-
-void traceln(byte b) {
-   if (!disableTraceDisplay) {
-    Serial.println(b);
-  } 
-}
-
-void traceln(byte b, int base) {
-  if (!disableTraceDisplay) {
-    Serial.println(b, base);
-  }
-}
-
 int toFarenheit(int celcius) {
   double c = celcius;
   double f = c * 9.0 / 5.0 + 32.0;
   return (int) f;
 }
 
-void printE32Parameters(struct Configuration configuration) {
-    traceln("----------------------------------------");
- 
-    trace("HEAD BIN: ");  
-    trace(configuration.HEAD, BIN);
-    trace(" ");
-    trace(configuration.HEAD, DEC);
-    trace(" ");
-    traceln(configuration.HEAD, HEX);
-    traceln(" ");
-    trace("AddH BIN: ");  
-    traceln(configuration.ADDH, BIN);
-    trace("AddL BIN: ");  
-    traceln(configuration.ADDL, BIN);
-    trace("Chan BIN: ");  
-    trace(configuration.CHAN, DEC); 
-    trace(" -> "); 
-    traceln(configuration.getChannelDescription().c_str());
-    traceln(" ");
-    trace("SpeedParityBit BIN    : ");  
-    trace(configuration.SPED.uartParity, BIN);
-    trace(" -> "); 
-    traceln(configuration.SPED.getUARTParityDescription().c_str());
-    trace("SpeedUARTDataRate BIN : ");  
-    trace(configuration.SPED.uartBaudRate, BIN);
-    trace(" -> "); 
-    traceln(configuration.SPED.getUARTBaudRate().c_str());
-    trace("SpeedAirDataRate BIN  : ");  
-    trace(configuration.SPED.airDataRate, BIN);
-    trace(" -> "); 
-    traceln(configuration.SPED.getAirDataRate().c_str());
-    trace("OptionTrans BIN       : ");  
-    trace(configuration.OPTION.fixedTransmission, BIN);
-    trace(" -> "); 
-    traceln(configuration.OPTION.getFixedTransmissionDescription().c_str());
-    trace("OptionPullup BIN      : ");  
-    trace(configuration.OPTION.ioDriveMode, BIN);
-    trace(" -> "); 
-    traceln(configuration.OPTION.getIODroveModeDescription().c_str());
-    trace("OptionWakeup BIN      : ");  
-    trace(configuration.OPTION.wirelessWakeupTime, BIN);
-    trace(" -> "); 
-    traceln(configuration.OPTION.getWirelessWakeUPTimeDescription().c_str());
-    trace("OptionFEC BIN         : ");  
-    trace(configuration.OPTION.fec, BIN);
-    trace(" -> "); 
-    traceln(configuration.OPTION.getFECDescription().c_str());
-    trace("OptionPower BIN       : ");  
-    trace(configuration.OPTION.transmissionPower, BIN);
-    trace(" -> "); 
-    traceln(configuration.OPTION.getTransmissionPowerDescription().c_str());
- 
-    traceln("----------------------------------------");
- 
-}
-void printE32ModuleInformation(struct ModuleInformation moduleInformation) {
-    traceln("----------------------------------------");
-    trace("HEAD BIN: ");  
-    trace(moduleInformation.HEAD, BIN);
-    trace(" ");
-    trace(moduleInformation.HEAD, DEC);
-    trace(" ");
-    traceln(moduleInformation.HEAD, HEX);
- 
-    trace("Freq.: ");  
-    traceln(moduleInformation.frequency, HEX);
-    trace("Version  : ");  
-    traceln(moduleInformation.version, HEX);
-    trace("Features : ");  
-    traceln(moduleInformation.features, HEX);
-    traceln("----------------------------------------");
-}
-
 void setupE32Service() {
-	e32ttl100.begin();
-
-	// After set configuration comment set M0 and M1 to low
-	// and reboot if you directly set HIGH M0 and M1 to program
-  ResponseStructContainer c = e32ttl100.getConfiguration();
-  // It's important get configuration pointer before all other operation
-  Configuration configuration = *(Configuration*) c.data;
-  configuration.ADDL = 0x01;
-  configuration.ADDH = 0x00;
-  configuration.CHAN = 0x02;
-  configuration.OPTION.fixedTransmission = FT_FIXED_TRANSMISSION;
-  e32ttl100.setConfiguration(configuration, WRITE_CFG_PWR_DWN_SAVE);
-
-  traceln(c.status.getResponseDescription().c_str());
-  traceln(c.status.code);
-
-  printE32Parameters(configuration);
-
-  ResponseStructContainer cMi;
-  cMi = e32ttl100.getModuleInformation();
-  // It's important get information pointer before all other operation
-  ModuleInformation mi = *(ModuleInformation*)cMi.data;
-
-  traceln(cMi.status.getResponseDescription().c_str());
-  traceln(cMi.status.code);
-
-  printE32ModuleInformation(mi);
-  c.close();
+  dataTransferE32.configure();
 }
 
 bool isLowVoltage() {
@@ -364,35 +232,20 @@ void deepSleep() {
     ESP.deepSleep(TIME_TO_SLEEP * uS_TO_S_FACTOR, RF_DEFAULT);
 }
 
-void printSensorsValues() {
-    char str[150];
-    sprintf(str, "Notify values: sleep delay=%d seconds, water temperature=%d, charge=%d, alarm low voltage=%d", 
-            TIME_TO_SLEEP, waterTemperature, charge, isLowVoltage());
-    traceln(str);
-}
-
-struct Message {
-    char type[5];
-    int timeToSleep;
-    int temperature;
-    int charge;
-    int isLowVoltage;
-};
-
 void notifySensorsValues() {
-  Message message;
+  DataTransferMessage message;
   strcpy(message.type, MESSAGE_TYPE_DATA);
-  message.timeToSleep = TIME_TO_SLEEP;
-  message.temperature = TIME_TO_SLEEP;
-  message.isLowVoltage = TIME_TO_SLEEP;
+  message.timeToSleep = timeToSleep;
+  message.temperature = temperature;
+  message.isLowVoltage = isLowVoltage;
 
   sendE32Data(message);
-  printSensorsValues();
+  printMessageValues(message);
 }
 
-void sendE32Data(Message data) {
+void sendE32Data(DataTransferMessage data) {
 	traceln("Send message to E32 Wifi");
-	ResponseStatus rs = e32ttl100.sendFixedMessage(0, 3, 0x04, (void *)&data, sizeof(data));
+  ResponseStatus rs = dataTransferE32.sendData(message, 0, 3, 0x04);
 	traceln(rs.getResponseDescription().c_str());
 }
 
@@ -410,7 +263,7 @@ void setup() {
   readSensors();
     
   setupNotification();
-  //TODO setupE32Service(); 
+  setupE32Service(); 
 }
 
 void loop() {
