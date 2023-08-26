@@ -3,7 +3,7 @@
 
 #include <SoftwareSerial.h>
 #include "LoRa_E32.h"
-#include "../../data_transfer/data_transfer_e32.h"
+#include "data_transfer_e32.h"
 
 class DataTransferE32WifiImpl : public DataTransferE32 {
 public:

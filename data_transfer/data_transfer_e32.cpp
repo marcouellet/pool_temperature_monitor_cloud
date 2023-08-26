@@ -1,5 +1,5 @@
 #include "data_transfer_e32.h"
-#include "../logging/trace.h"
+#include "trace.h"
 
 DataTransferE32::DataTransferE32(SoftwareSerial* serial, byte auxPin, byte m0Pin, byte m1Pin) : e32ttl100(serial, auxPin, m0Pin, m1Pin) {
 	e32ttl100.begin();

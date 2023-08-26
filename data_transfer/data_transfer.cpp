@@ -1,5 +1,5 @@
 #include "data_transfer.h"
-#include "../logging/trace.h"
+#include "trace.h"
 
 void printMessageValues(DataTransferMessage message) {
     char str[150];
