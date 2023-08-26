@@ -6,9 +6,22 @@
 #include <DallasTemperature.h>
 #include <SoftwareSerial.h>
 #include <EByte_LoRa_E32_library.h>
+#include "data_transfer_e32_sensor_impl.h"
+#include "trace.h"
 
 #define I2C_SDA 21
 #define I2C_SCL 15
+
+SoftwareSerial mySerial(D2, D3); // ESP8266 RX <-- e32 TX, ESP8266 TX --> e32 RX
+DataTransferE32SensorImpl dataTransferE32(&mySerial, D5, D7, D6);
+
+MAX17043 powerGauge(40);
+
+// Setup a oneWire instance to communicate with any OneWire devices
+OneWire oneWire(oneWireBus);
+
+// Pass our oneWire reference to Dallas Temperature sensor 
+DallasTemperature sensors(&oneWire);
 
 // GPIO where the DS18B20 is connected to
 const int oneWireBus = 2;
@@ -39,14 +52,6 @@ int waterTemperature;
 int airTemperature;
 bool disableTraceDisplay = false;
 
-MAX17043 powerGauge(40);
-
-// Setup a oneWire instance to communicate with any OneWire devices
-OneWire oneWire(oneWireBus);
-
-// Pass our oneWire reference to Dallas Temperature sensor 
-DallasTemperature sensors(&oneWire);
-
 // N.B. All delays are in seconds
 #define uS_TO_S_FACTOR 1000000ULL         /* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP  60 * 5             /* Time ESP32 will stay in deep sleep before awakening (in seconds) */
@@ -56,18 +61,6 @@ DallasTemperature sensors(&oneWire);
 #define DELAY_TO_DISPLAY_SCREEN 5         /* Time to keep display active */
 #define NOTIFICATION_REPEAT_COUNT_MAX  2  /* Max notifications to send during notification period */
 #define SETUP_SENSORS_DELAY  0.5          /* Delay to read DS18B20 data before initialisation */
-
-void trace(const char * str) {
-  if (!disableTraceDisplay) {
-    Serial.print(str);
-  }
-}
-
-void traceln(const char * str) {
-   if (!disableTraceDisplay) {
-    Serial.println(str);
-  } 
-}
 
 int toFarenheit(int celcius) {
   double c = celcius;
@@ -251,26 +244,21 @@ void deepSleep() {
     ESP.deepSleep(TIME_TO_SLEEP * uS_TO_S_FACTOR, RF_DEFAULT);
 }
 
-void printSensorsValues() {
-    char str[150];
-    sprintf(str, "Notify values: sleep delay=%d seconds, water temperature=%d, air temperature=%d, charge=%d, alarm low voltage=%d", 
-            TIME_TO_SLEEP, waterTemperature, airTemperature, charge, isLowVoltage());
-    traceln(str);
+void notifySensorsValues() {
+  DataTransferMessage message;
+  strcpy(message.type, MESSAGE_TYPE_DATA);
+  message.timeToSleep = TIME_TO_SLEEP;
+  message.temperature = waterTemperature;
+  message.isLowVoltage = isLowVoltage();
+
+  sendE32Data(message);
+  printMessageValues(message);
 }
 
-void notifySensorsValues() {
-    String str = "";
-    str += TIME_TO_SLEEP;
-    str += ",";
-    str += waterTemperature;
-    str += ",";
-    str += airTemperature;
-    str += ",";
-    str += charge;
-    str += ",";
-    str += isLowVoltage() ? "1" : "0";
-    //TODO E32 send data
-    printSensorsValues();
+void sendE32Data(const DataTransferMessage message) {
+	traceln("Send message to E32 Wifi");
+  ResponseStatus rs = dataTransferE32.sendData(message, 0x00, 0x03, 0x04);
+	traceln(rs.getResponseDescription().c_str());
 }
 
 void setup() {

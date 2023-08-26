@@ -4,6 +4,7 @@
 #include <MAX17043.h>
 #include <DHT.h>
 #include "data_transfer_e32_sensor_impl.h"
+#include "trace.h"
 
 #define DHTPIN 17     
 #define DHTTYPE    DHT11
@@ -235,17 +236,17 @@ void deepSleep() {
 void notifySensorsValues() {
   DataTransferMessage message;
   strcpy(message.type, MESSAGE_TYPE_DATA);
-  message.timeToSleep = timeToSleep;
-  message.temperature = temperature;
-  message.isLowVoltage = isLowVoltage;
+  message.timeToSleep = TIME_TO_SLEEP;
+  message.temperature = waterTemperature;
+  message.isLowVoltage = isLowVoltage();
 
   sendE32Data(message);
   printMessageValues(message);
 }
 
-void sendE32Data(DataTransferMessage data) {
+void sendE32Data(const DataTransferMessage message) {
 	traceln("Send message to E32 Wifi");
-  ResponseStatus rs = dataTransferE32.sendData(message, 0, 3, 0x04);
+  ResponseStatus rs = dataTransferE32.sendData(message, 0x00, 0x03, 0x04);
 	traceln(rs.getResponseDescription().c_str());
 }
 

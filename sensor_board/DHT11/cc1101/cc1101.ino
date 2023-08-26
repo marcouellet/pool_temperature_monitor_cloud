@@ -4,6 +4,8 @@
 #include <MAX17043.h>
 #include "cc1101.h"
 #include <DHT.h>
+#include "data_transfer_cc1101.h"
+#include "trace.h"
 
 #define DHTPIN 17     
 #define DHTTYPE    DHT11
@@ -13,8 +15,9 @@
 #define DEVICE_ADDRESS        20 // this device
 #define DEST_ADDRESS          0  // broadcast
 
+DataTransferCC1101 cc1101(CFREQ_922, RADIO_CHANNEL, DEVICE_ADDRESS, 10);
+
 DHT dht(DHTPIN, DHTTYPE);
-CC1101 radio;
 Ticker notificationTimer;
 Ticker delayBeforeSleepTimer;
 Ticker delayBetweenNotificationsTimer;
@@ -50,18 +53,6 @@ MAX17043 powerGauge(40);
 #define DELAY_TO_DISPLAY_SCREEN 5         /* Time to keep display active */
 #define NOTIFICATION_REPEAT_COUNT_MAX  2  /* Max notifications to send during notification period */
 #define SETUP_SENSORS_DELAY  0.5          /* Delay to read DS18B20 data before initialisation */
-
-void trace(const char * str) {
-  if (!disableTraceDisplay) {
-    Serial.print(str);
-  }
-}
-
-void traceln(const char * str) {
-   if (!disableTraceDisplay) {
-    Serial.println(str);
-  } 
-}
 
 int toFarenheit(int celcius) {
   double c = celcius;
@@ -220,44 +211,23 @@ void deepSleep() {
     sprintf(str, "Going to deep sleep for %d seconds", TIME_TO_SLEEP);
     traceln(str);
 
-    radio.setPowerDownState();
+    cc1101.sleep();
+
     ESP.deepSleep(TIME_TO_SLEEP * uS_TO_S_FACTOR, RF_DEFAULT);
 }
 
-void printSensorsValues() {
-    char str[150];
-    sprintf(str, "Notify values: sleep delay=%d seconds, water temperature=%d, charge=%d, alarm low voltage=%d", 
-            TIME_TO_SLEEP, waterTemperature, charge, isLowVoltage());
-    traceln(str);
-}
-
 void notifySensorsValues() {
-    String str = "";
-    str += TIME_TO_SLEEP;
-    str += ",";
-    str += waterTemperature;
-    str += ",";
-    str += charge;
-    str += ",";
-    str += isLowVoltage() ? "1" : "0";
-    sendCC1101Data(str.c_str());
-    printSensorsValues();
+  DataTransferMessage message;
+  strcpy(message.type, MESSAGE_TYPE_DATA);
+  message.timeToSleep = TIME_TO_SLEEP;
+  message.temperature = waterTemperature;
+  message.isLowVoltage = isLowVoltage();
+  sendCC1101Data(message);
+  printMessageValues(message);
 }
 
-void sendCC1101Data(const char * data) {
-  radio.sendChars(data, DEST_ADDRESS); 
-}
-
-void setupC1101Service() {
-  // Start RADIO
-    while (!radio.begin(CFREQ_922, RADIO_CHANNEL, DEVICE_ADDRESS));   // channel 16! Whitening enabled 
-
-    radio.setOutputPowerLeveldBm(10); // max power
-     
-    delay(1000); // Try again in 5 seconds
-    //radio.printCConfigCheck();     
-
-    traceln("CC1101 radio initialized.");
+void sendCC1101Data(DataTransferMessage data) {
+  cc1101.sendData(data, DEST_ADDRESS);
 }
 
 void setup() {
@@ -274,7 +244,6 @@ void setup() {
   readSensors();
 
   setupNotification();
-  setupC1101Service(); 
 }
 
 void loop() {

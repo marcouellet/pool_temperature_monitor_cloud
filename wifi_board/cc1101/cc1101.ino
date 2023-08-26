@@ -2,7 +2,8 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <Ticker.h>
-#include "cc1101.h"
+#include "data_transfer_cc1101.h"
+#include "trace.h"
 
 #define BLYNK_TEMPLATE_ID "**********"
 #define BLYNK_TEMPLATE_NAME "*************"
@@ -14,6 +15,8 @@
 const int maxbauds = 115200;
 int charge = 0;
 int temperature = 0;
+int isLowVoltage = 0;
+int timeToSleep = 0;
 bool disableTraceDisplay = false;
 String  receive_payload;
 
@@ -34,7 +37,7 @@ const char* blynkPassword = "**********";
 const int blynkVpinTemperature = 10;
 const int blynkVpinCharge = 11;
 
-CC1101 radio;
+DataTransferCC1101 cc1101(CFREQ_922, RADIO_CHANNEL, DEVICE_ADDRESS, 10);
 
 void trace(const char * str) {
     if (!disableTraceDisplay) {
@@ -74,16 +77,7 @@ void setupBlynkClient() {
 }
 
 void setupC1101Service() {
-  // Start RADIO
-  while (!radio.begin(CFREQ_922, RADIO_CHANNEL, DEVICE_ADDRESS));   // channel 16! Whitening enabled 
-   
-  delay(1000); // Try again in 5 seconds
-  //radio.printCConfigCheck();     
-
-  radio.setRxAlways();
-  radio.setRxState();    
-
-  traceln("CC1101 radio initialized.");
+    cc1101.setupForReceive();
 }
 
 void sendDataToBlynkServer() {
@@ -146,20 +140,18 @@ void setup()
 
 void loop()
 {
-	if ( radio.dataAvailable() )
-    {       
-        traceln("Data available.");    
-
-        receive_payload  = String(radio.getChars()); // pointer to memory location of start of string
-        //trace("Payload size received: "); traceln(radio.getSize());
-		
-        trace("Payload received: ");
-        traceln(receive_payload.c_str());
-		
-        //TODO set payload data into charge and temperature variables.
-        sendDataToBlynkServer();
-        //sendDataToWifiServer();
-        
-        delay(100);
+	if ( cc1101.isDataAvailable() )
+    {  
+        DataTransferMessage* message = cc1101.getData();
+        if (message != NULL) {
+            if (strcmp(message->type, MESSAGE_TYPE_DATA)) {
+                temperature = message->temperature;
+                charge = message->charge;
+                isLowVoltage = message->isLowVoltage;
+                //sendDataToWifiServer();
+                sendDataToBlynkServer();
+                delay(100);
+            }
+        }     
     }
 }

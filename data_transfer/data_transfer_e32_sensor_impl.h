@@ -3,9 +3,9 @@
 
 #include <SoftwareSerial.h>
 #include "LoRa_E32.h"
-#include "../../data_transfer/data_transfer_e32.h"
+#include "data_transfer_e32.h"
 
-class DataTransferE32SensorImpl : DataTransferE32 {
+class DataTransferE32SensorImpl : public DataTransferE32 {
 public:
   DataTransferE32SensorImpl(SoftwareSerial* serial, byte auxPin, byte m0Pin, byte m1Pin): DataTransferE32(serial, auxPin, m0Pin, m1Pin);
   virtual void configure(); 

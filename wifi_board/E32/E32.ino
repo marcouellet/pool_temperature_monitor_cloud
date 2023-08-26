@@ -1,5 +1,6 @@
 #include <Ticker.h>
 #include "data_transfer_e32_wifi_impl.h"
+#include "trace.h"
 
 #include <SPI.h>
 #include <ESP8266WiFi.h>
@@ -144,19 +145,17 @@ void setup()
 void loop()
 {
     if (dataTransferE32.isDataAvailable()){
-        DataTransferMessage message = dataTransferE32.getData();
-
-        if (strcmp(message.type, MESSAGE_TYPE_DATA)) {
-            temperature = message.temperature;
-            charge = message.charge;
-            isLowVoltage = message.isLowVoltage;
-            timeToSleep = message.timeToSleep;
-            //sendDataToWifiServer();
-            sendDataToBlynkServer();
+        DataTransferMessage* message = dataTransferE32.getData();
+        if (message != NULL) {
+            if (strcmp(message->type, MESSAGE_TYPE_DATA)) {
+                temperature = message->temperature;
+                charge = message->charge;
+                isLowVoltage = message->isLowVoltage;
+                timeToSleep = message->timeToSleep;
+                //sendDataToWifiServer();
+                sendDataToBlynkServer();
+            }
         }
-
-    //		free(rsc.data);
-        rsc.close();
     }
 }
 

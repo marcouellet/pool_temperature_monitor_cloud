@@ -20,6 +20,8 @@
                 "C:\\Users\\Administrator\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\tools\\sdk\\include",
                 "C:\\Users\\Administrator\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\tools\\sdk\\lwip2\\include",
                 "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\build\\core",
+                "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\data_transfer",
+                "E:\\Documents\\Flutter\\pool_temperature_monitor_cloud\\logging",
                 "C:\\Users\\Administrator\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\cores\\esp8266",
                 "C:\\Users\\Administrator\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\variants\\nodemcu",
                 "C:\\Users\\Administrator\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\libraries\\Ticker\\src",

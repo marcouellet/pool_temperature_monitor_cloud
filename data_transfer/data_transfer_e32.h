@@ -8,7 +8,7 @@
 class DataTransferE32 {
 public:
   DataTransferE32(SoftwareSerial* serial, byte auxPin, byte m0Pin, byte m1Pin);
-  virtual void configure(); 
+  virtual void configure() = 0; 
   STATUS setMode(MODE_TYPE mode);
   bool isDataAvailable();
   DataTransferMessage* getData();

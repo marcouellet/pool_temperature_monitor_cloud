@@ -9,6 +9,10 @@ bool DataTransferE32::isDataAvailable() {
     return e32ttl100.available()  > 1;
 }
 
+STATUS DataTransferE32::setMode(MODE_TYPE mode) {
+    return e32ttl100.setMode(mode);
+}
+
 DataTransferMessage* DataTransferE32::getData() {
     if ( isDataAvailable() )
     {       
