@@ -144,7 +144,7 @@ void loop()
     {  
         DataTransferMessage* message = cc1101.getData();
         if (message != NULL) {
-            if (strcmp(message->type, MESSAGE_TYPE_DATA)) {
+            if (strcmp(message->type, MESSAGE_TYPE_DATA) == 0) {
                 temperature = message->temperature;
                 charge = message->charge;
                 isLowVoltage = message->isLowVoltage;
