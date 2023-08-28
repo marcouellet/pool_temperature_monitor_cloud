@@ -2,7 +2,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <Ticker.h>
-#include "data_transfer_cc1101.h"
+#include "data_transfer_cc1101.hpp"
 #include "trace.h"
 
 #define BLYNK_TEMPLATE_ID "**********"

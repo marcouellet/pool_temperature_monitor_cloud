@@ -1,5 +1,5 @@
-#ifndef DATA_TRANSFER_H
-#define DATA_TRANSFER_H
+#ifndef DATA_TRANSFER_HPP
+#define DATA_TRANSFER_HPP
 
 #define MESSAGE_TYPE_DATA "DATA"          /* Temperature and charge data */
 

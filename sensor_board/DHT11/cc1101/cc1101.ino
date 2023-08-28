@@ -4,7 +4,7 @@
 #include <MAX17043.h>
 #include "cc1101.h"
 #include <DHT.h>
-#include "data_transfer_cc1101.h"
+#include "data_transfer_cc1101.hpp"
 #include "trace.h"
 
 #define DHTPIN 17     

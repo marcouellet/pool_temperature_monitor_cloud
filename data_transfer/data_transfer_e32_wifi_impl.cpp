@@ -1,4 +1,4 @@
-#include "data_transfer_e32_wifi_impl.h"
+#include "data_transfer_e32_wifi_impl.hpp"
 #include "trace.h"
 
 DataTransferE32WifiImpl::DataTransferE32WifiImpl(SoftwareSerial* serial, byte auxPin, byte m0Pin, byte m1Pin): 

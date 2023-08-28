@@ -1,9 +1,9 @@
-#ifndef DATA_TRANSFER_E32_WIFI_IMPL_H
-#define DATA_TRANSFER_E32_WIFI_IMPL_H
+#ifndef DATA_TRANSFER_E32_WIFI_IMPL_HPP
+#define DATA_TRANSFER_E32_WIFI_IMPL_HPP
 
 #include <SoftwareSerial.h>
 #include "LoRa_E32.h"
-#include "data_transfer_e32.h"
+#include "data_transfer_e32.hpp"
 
 class DataTransferE32WifiImpl : public DataTransferE32 {
 public:

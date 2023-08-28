@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include <MAX17043.h>
 #include <DHT.h>
-#include "data_transfer_e32_sensor_impl.h"
+#include "data_transfer_e32_sensor_impl.hpp"
 #include "trace.h"
 
 #define DHTPIN 17     

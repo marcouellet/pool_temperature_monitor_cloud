@@ -6,7 +6,7 @@
 #include <DallasTemperature.h>
 #include <SoftwareSerial.h>
 #include <EByte_LoRa_E32_library.h>
-#include "data_transfer_e32_sensor_impl.h"
+#include "data_transfer_e32_sensor_impl.hpp"
 #include "trace.h"
 
 #define I2C_SDA 21

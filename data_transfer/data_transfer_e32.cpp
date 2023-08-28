@@ -1,4 +1,4 @@
-#include "data_transfer_e32.h"
+#include "data_transfer_e32.hpp"
 #include "trace.h"
 
 DataTransferE32::DataTransferE32(SoftwareSerial* serial, byte auxPin, byte m0Pin, byte m1Pin) : e32ttl100(serial, auxPin, m0Pin, m1Pin) {
@@ -9,7 +9,7 @@ bool DataTransferE32::isDataAvailable() {
     return e32ttl100.available()  > 1;
 }
 
-STATUS DataTransferE32::setMode(MODE_TYPE mode) {
+Status DataTransferE32::setMode(MODE_TYPE mode) {
     return e32ttl100.setMode(mode);
 }
 

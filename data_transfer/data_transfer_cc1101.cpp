@@ -1,7 +1,7 @@
-#include "data_transfer_cc1101.h"
+#include "data_transfer_cc1101.hpp"
 
-DataTransferCC1101::DataTransferCC1101(CFREQ freq, uint8_t channr, uint8_t addr, uint8_t powerLevel) {
-    while (!cc1101.begin(CFREQ_922, channr, addr));   
+DataTransferCC1101::DataTransferCC1101(CFREQ freq, byte channr, byte addr, byte powerLevel) {
+    while (!cc1101.begin(freq, channr, addr));   
     cc1101.setOutputPowerLeveldBm(powerLevel); 
 }
 

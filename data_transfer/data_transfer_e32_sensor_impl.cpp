@@ -1,4 +1,4 @@
-#include "data_transfer_e32_sensor_impl.h"
+#include "data_transfer_e32_sensor_impl.hpp"
 #include "trace.h"
 
 DataTransferE32SensorImpl::DataTransferE32SensorImpl(SoftwareSerial* serial, byte auxPin, byte m0Pin, byte m1Pin): 

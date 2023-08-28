@@ -1,5 +1,5 @@
 #include <Ticker.h>
-#include "data_transfer_e32_wifi_impl.h"
+#include "data_transfer_e32_wifi_impl.hpp"
 #include "trace.h"
 
 #include <SPI.h>

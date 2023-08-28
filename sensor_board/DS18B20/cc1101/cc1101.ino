@@ -4,7 +4,7 @@
 #include <MAX17043.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-#include "data_transfer_cc1101.h"
+#include "data_transfer_cc1101.hpp"
 #include "trace.h"
 
 #define I2C_SDA 21
