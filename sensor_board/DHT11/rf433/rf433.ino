@@ -3,18 +3,19 @@
 #include <Wire.h>
 #include <MAX17043.h>
 #include <DHT.h>
-#include "data_transfer_cc1101_sensor_impl.hpp"
+#include "data_transfer_rf433_sensor_impl.hpp"
 #include "trace.h"
 
 #define DHTPIN 17     
 #define DHTTYPE    DHT11
 #define I2C_SDA 21
 #define I2C_SCL 15
-#define RADIO_CHANNEL         16
-#define DEVICE_ADDRESS        20 // this device
-#define DEST_ADDRESS          0  // broadcast
 
-DataTransferCC1101SensorImpl cc1101(CFREQ_922, RADIO_CHANNEL, DEVICE_ADDRESS, 10);
+// DataTransferRF433SensorImpl rf433(2000, 4, 5, 0); // ESP8266 or ESP32: do not use pin 11 or 2
+// DataTransferRF433SensorImpl rf433(2000, 3, 4, 0); // ATTiny, RX on D3 (pin 2 on attiny85) TX on D4 (pin 3 on attiny85), 
+// DataTransferRF433SensorImpl rf433(2000, PD14, PD13, 0); STM32F4 Discovery: see tx and rx on Orange and Red LEDS
+
+DataTransferRF433SensorImpl rf433(2000, D4, D5, D0); // ESP8266
 
 DHT dht(DHTPIN, DHTTYPE);
 Ticker notificationTimer;
@@ -210,8 +211,6 @@ void deepSleep() {
     sprintf(str, "Going to deep sleep for %d seconds", TIME_TO_SLEEP);
     traceln(str);
 
-    cc1101.sleep();
-
     ESP.deepSleep(TIME_TO_SLEEP * uS_TO_S_FACTOR, RF_DEFAULT);
 }
 
@@ -221,12 +220,12 @@ void notifySensorsValues() {
   message.timeToSleep = TIME_TO_SLEEP;
   message.temperature = waterTemperature;
   message.isLowVoltage = isLowVoltage();
-  sendCC1101Data(message);
+  sendRF433Data(message);
   printMessageValues(message);
 }
 
-void sendCC1101Data(DataTransferMessage data) {
-  cc1101.sendData(data, DEST_ADDRESS);
+void sendRF433Data(const DataTransferMessage data) {
+  rf433.sendData(&data);
 }
 
 void setup() {

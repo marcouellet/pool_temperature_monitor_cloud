@@ -5,7 +5,8 @@
 
 class DataTransferRF433SensorImpl : public DataTransferRF433 {
 public:
-  DataTransferRF433SensorImpl(SoftwareSerial* serial, byte m0_pin, byte m1_pin, byte aux_pin);
+  DataTransferRF433SensorImpl(uint16_t speed = 2000, uint8_t rxPin = 11, uint8_t txPin = 12, uint8_t pttPin = 10, bool pttInverted = false);
+
   virtual void configure(); 
 };
 
