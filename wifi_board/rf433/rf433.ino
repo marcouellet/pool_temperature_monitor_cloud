@@ -43,18 +43,6 @@ const int blynkVpinCharge = 11;
 
 DataTransferRF433WifiImpl rf433(2000, D4, D5, D0); // ESP8266
 
-void trace(const char * str) {
-    if (!disableTraceDisplay) {
-    Serial.print(str);
-    }
-}
-
-void traceln(const char * str) {
-    if (!disableTraceDisplay) {
-    Serial.println(str);
-    } 
-}
-
 void setupWifiClient() {
     /* Explicitly set the ESP8266 to be a WiFi-client, otherwise, it by default,
      would try to act as both a client and an access-point and could cause
