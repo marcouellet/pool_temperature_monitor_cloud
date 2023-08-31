@@ -2,15 +2,15 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <Ticker.h>
-#include "data_transfer_cc1101_wifi_impl.hpp"
+#include "data_transfer_rf24_wifi_impl.hpp"
 #include "trace.h"
 
 #define BLYNK_TEMPLATE_ID "**********"
 #define BLYNK_TEMPLATE_NAME "*************"
 #include <BlynkSimpleEsp8266.h>
 
-#define RADIO_CHANNEL         16
-#define DEVICE_ADDRESS        21 // this device
+#define CE_PIN 7
+#define CSN_PIN 8
 
 const int maxbauds = 115200;
 int charge = 0;
@@ -37,7 +37,7 @@ const char* blynkPassword = "**********";
 const int blynkVpinTemperature = 10;
 const int blynkVpinCharge = 11;
 
-DataTransferCC1101WifiImpl cc1101(CFREQ_922, RADIO_CHANNEL, DEVICE_ADDRESS, 10);
+DataTransferRF24WifiImpl rf24(CE_PIN, CSN_PIN);
 
 void setupWifiClient() {
     /* Explicitly set the ESP8266 to be a WiFi-client, otherwise, it by default,
@@ -62,10 +62,6 @@ void setupBlynkClient() {
 
     traceln("");
     traceln("Blynk connected");
-}
-
-void setupC1101Service() {
-    cc1101.setupForReceive();
 }
 
 void sendDataToBlynkServer() {
@@ -123,14 +119,13 @@ void setup()
 
     //setupWifiClient();
     setupBlynkClient();
-    setupC1101Service();
 }
 
 void loop()
 {
-	if ( cc1101.isDataAvailable() )
+	if ( rf24.isDataAvailable() )
     {  
-        DataTransferMessage* message = cc1101.getData();
+        DataTransferMessage* message = rf24.getData();
         if (message != NULL) {
             if (strcmp(message->type, MESSAGE_TYPE_DATA) == 0) {
                 temperature = message->temperature;

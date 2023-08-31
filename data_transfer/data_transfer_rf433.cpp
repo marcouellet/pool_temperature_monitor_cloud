@@ -2,7 +2,7 @@
 #include "trace.h"
 
 DataTransferRF433::DataTransferRF433(uint16_t speed, uint8_t rxPin, uint8_t txPin, uint8_t pttPin, bool pttInverted) : 
-    rhask(speed, rxPin, txPin, pttPin, pttInverted){
+    rhask(speed, rxPin, txPin, pttPin, pttInverted) {
     if (!rhask.init())
          traceln("RF433 init failed");
 }
