@@ -7,6 +7,7 @@
 class DataTransferCC1101 {
 public:
   DataTransferCC1101(CFREQ freq, byte channr, byte addr, byte powerLevel);
+  virtual void configure() = 0; 
   void setupForReceive();
   bool isDataAvailable();
   void sleep();
