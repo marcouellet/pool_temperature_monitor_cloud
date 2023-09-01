@@ -28,6 +28,6 @@ DataTransferMessage* DataTransferCC1101::getData() {
     }
 }
 
-void DataTransferCC1101::sendData(const DataTransferMessage data, uint8_t destAddr) {
+void DataTransferCC1101::sendData(const DataTransferMessage data, byte destAddr) {
   cc1101.sendChars((const char *)&data, destAddr); 
 }
