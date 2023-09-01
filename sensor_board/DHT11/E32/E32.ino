@@ -28,7 +28,7 @@
  */
 
 SoftwareSerial mySerial(D2, D3); // ESP8266 RX <-- e32 TX, ESP8266 TX --> e32 RX
-DataTransferE32SensorImpl dataTransferE32(&mySerial, D5, D7, D6);
+DataTransferE32SensorImpl e32(&mySerial, D5, D7, D6);
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -76,7 +76,7 @@ int toFarenheit(int celcius) {
 }
 
 void setupE32Service() {
-  dataTransferE32.configure();
+  e32.configure();
 }
 
 bool isLowVoltage() {
@@ -246,7 +246,7 @@ void notifySensorsValues() {
 
 void sendE32Data(const DataTransferMessage message) {
 	traceln("Send message to E32 Wifi");
-  ResponseStatus rs = dataTransferE32.sendData(message, 0x00, 0x03, 0x04);
+  ResponseStatus rs = e32.sendData(message, 0x00, 0x03, 0x04);
 	traceln(rs.getResponseDescription().c_str());
 }
 

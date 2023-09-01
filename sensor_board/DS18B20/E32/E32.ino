@@ -13,7 +13,7 @@
 #define I2C_SCL 15
 
 SoftwareSerial mySerial(D2, D3); // ESP8266 RX <-- e32 TX, ESP8266 TX --> e32 RX
-DataTransferE32SensorImpl dataTransferE32(&mySerial, D5, D7, D6);
+DataTransferE32SensorImpl e32(&mySerial, D5, D7, D6);
 
 MAX17043 powerGauge(40);
 
@@ -94,6 +94,10 @@ void checkPowerGaugeAvailable() {
       sprintf(str, "Error %d while accessing MAX17043 device at address 0x%02X", error, MAX17043_ADDRESS);
       traceln(str);
     }
+}
+
+void setupE32Service() {
+  e32.configure();
 }
 
 void setupPowerGauge() {
@@ -257,7 +261,7 @@ void notifySensorsValues() {
 
 void sendE32Data(const DataTransferMessage message) {
 	traceln("Send message to E32 Wifi");
-  ResponseStatus rs = dataTransferE32.sendData(message, 0x00, 0x03, 0x04);
+  ResponseStatus rs = e32.sendData(message, 0x00, 0x03, 0x04);
 	traceln(rs.getResponseDescription().c_str());
 }
 
@@ -277,7 +281,7 @@ void setup() {
   displayDS18B20Info();
 
   setupNotification();
-  //TODO setupE32Service(); 
+  setupE32Service(); 
 }
 
 void loop() {

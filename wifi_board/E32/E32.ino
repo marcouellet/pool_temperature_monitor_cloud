@@ -28,7 +28,7 @@
  */
 
 SoftwareSerial mySerial(D2, D3); // ESP8266 RX <-- e32 TX, ESP8266 TX --> e32 RX
-DataTransferE32WifiImpl dataTransferE32(&mySerial, D5, D7, D6);
+DataTransferE32WifiImpl e32(&mySerial, D5, D7, D6);
 
 const int maxbauds = 115200;
 int charge = 0;
@@ -81,7 +81,7 @@ void setupBlynkClient() {
 }
 
 void setupE32Service() {
-  dataTransferE32.configure();
+  e32.configure();
 }
 
 void sendDataToBlynkServer() {
@@ -144,8 +144,8 @@ void setup()
 
 void loop()
 {
-    if (dataTransferE32.isDataAvailable()){
-        DataTransferMessage* message = dataTransferE32.getData();
+    if (e32.isDataAvailable()){
+        DataTransferMessage* message = e32.getData();
         if (message != NULL) {
             if (strcmp(message->type, MESSAGE_TYPE_DATA) == 0) {
                 temperature = message->temperature;
